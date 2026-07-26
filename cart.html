@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>م مكتبة البيان | مراجعة الطلب والشحن</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* إعدادات عامة */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #e74c3c;
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --green-color: #25d366;
+            --border-color: #ddd;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            padding-bottom: 60px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* 🌗 تخصيص الوضع الداكن الفاخر */
+        body.dark-theme {
+            --bg-color: #131c24;
+            --text-color: #f5f6fa;
+            --card-bg: #1e2b35;
+            --primary-color: #1a252f;
+            --border-color: #2c3e50;
+        }
+
+        /* شريط التنقل */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: background-color 0.3s;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 900;
+            text-decoration: none;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .logo:hover {
+            color: var(--secondary-color);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .lang-toggle {
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .lang-toggle:hover {
+            background: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+        }
+
+        .theme-toggle {
+            font-size: 22px;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            color: var(--secondary-color);
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .back-btn:hover {
+            color: var(--secondary-color);
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* حاوية المحتوى الرئيسي */
+        .main-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 30px;
+        }
+
+        .section-box {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .section-box h2 {
+            font-size: 22px;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+        }
+        body.dark-theme .section-box h2 {
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            outline: none;
+            font-size: 16px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: border-color 0.3s, background 0.3s, color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 8px rgba(231, 76, 60, 0.2);
+        }
+
+        .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e74c3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: left 15px center;
+            background-size: 20px;
+        }
+        html[dir="ltr"] .form-group select { background-position: right 15px center; }
+
+        /* 🏦 تصميم مربع بيانات البنك للحماية من الاحتيال */
+        .bank-details-box {
+            background-color: rgba(44, 62, 80, 0.05);
+            border: 2px dashed var(--primary-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+            display: none; 
+            animation: fadeInText 0.5s ease;
+        }
+        body.dark-theme .bank-details-box {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--secondary-color);
+        }
+        .bank-details-box p {
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        .bank-details-box p strong {
+            color: var(--primary-color);
+        }
+        body.dark-theme .bank-details-box p strong { color: var(--secondary-color); }
+        
+        .receipt-warning {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--secondary-color);
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .delivery-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .delivery-box {
+            border: 2px solid var(--border-color);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            font-weight: bold;
+            background: var(--bg-color);
+        }
+
+        .delivery-box.selected {
+            border-color: var(--secondary-color);
+            background-color: rgba(231, 76, 60, 0.05);
+            color: var(--secondary-color);
+            transform: scale(1.02);
+        }
+
+        .invoice-items {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 350px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 5px;
+        }
+
+        .invoice-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .invoice-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .invoice-item-info { flex: 1; }
+
+        .invoice-item-name {
+            font-weight: bold;
+            font-size: 15px;
+            color: var(--primary-color);
+        }
+        body.dark-theme .invoice-item-name { color: white; }
+
+        .invoice-item-qty {
+            font-size: 13px;
+            color: #777;
+            margin-top: 3px;
+        }
+        body.dark-theme .invoice-item-qty { color: #aaa; }
+
+        .invoice-item-price {
+            font-weight: 900;
+            color: var(--secondary-color);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        .summary-row.total {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--primary-color);
+            border-top: 2px dashed var(--border-color);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        body.dark-theme .summary-row.total { color: white; }
+
+        .summary-row.total .price { color: var(--secondary-color); }
+
+        .submit-order-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--green-color);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+            transition: transform 0.2s, background-color 0.2s;
+            margin-top: 20px;
+        }
+
+        .submit-order-btn:hover {
+            transform: translateY(-3px);
+            background-color: #1ebd58;
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.6);
+        }
+
+        .empty-cart-alert {
+            text-align: center;
+            padding: 40px 20px;
+            color: #777;
+            font-weight: bold;
+        }
+
+        @keyframes fadeInText { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 🧭 الزر العائم للأقسام (Floating Menu) */
+        .floating-menu-container {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 1500;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 15px;
+        }
+        html[dir="ltr"] .floating-menu-container {
+            left: auto;
+            right: 30px;
+        }
+        
+        .floating-main-btn {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--secondary-color), #c0392b);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: pulseMenuBtn 2s infinite alternate;
+        }
+        .floating-main-btn:hover {
+            transform: scale(1.1);
+        }
+        .floating-menu-container.active .floating-main-btn {
+            transform: rotate(45deg);
+            background: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(44, 62, 80, 0.5);
+            animation: none;
+        }
+
+        .floating-menu-list {
+            list-style: none;
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.9);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: bottom center;
+        }
+        body.dark-theme .floating-menu-list { border: 1px solid var(--border-color); }
+        
+        .floating-menu-container.active .floating-menu-list {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        
+        .floating-menu-list li a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: background 0.3s, color 0.3s, transform 0.2s;
+            white-space: nowrap;
+        }
+        .floating-menu-list li a i {
+            color: var(--secondary-color);
+            width: 20px;
+            text-align: center;
+        }
+        .floating-menu-list li a:hover {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--secondary-color);
+            transform: translateX(-5px);
+        }
+        html[dir="ltr"] .floating-menu-list li a:hover { transform: translateX(5px); }
+
+        /* 🌟 الزيل الثنائي (Dual Footer) */
+        .dual-footer {
+            background-color: #1a252f;
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 50px;
+            border-top: 4px solid var(--secondary-color);
+            position: relative;
+            overflow: hidden;
+        }
+        .footer-copyright {
+            font-size: 18px;
+            font-weight: 900;
+            background: linear-gradient(90deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb, #ff9a9e);
+            background-size: 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientAnim 5s ease infinite;
+            margin-bottom: 15px;
+        }
+        .footer-dev {
+            font-size: 15px;
+            color: #bdc3c7;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .footer-dev:hover {
+            color: white;
+            background: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        /* 💻 شاشة المطور المنبثقة (Developer Modal) */
+        .dev-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 3000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease;
+        }
+        .dev-modal-overlay.show {
+            opacity: 1; visibility: visible;
+        }
+        .dev-modal {
+            background: var(--card-bg);
+            width: 90%;
+            max-width: 400px;
+            height: 65vh; 
+            border-radius: 25px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            transform: translateY(50px);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        .dev-modal-overlay.show .dev-modal {
+            transform: translateY(0);
+        }
+        .close-dev-modal {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 24px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .close-dev-modal:hover { color: var(--secondary-color); }
+        
+        /* 📸 صورة المطور / الشركة */
+        .dev-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px auto;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid var(--secondary-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            background-color: var(--bg-color);
+        }
+        .dev-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .dev-company { font-size: 28px; font-weight: 900; color: var(--primary-color); margin-bottom: 5px; width: 100%; }
+        body.dark-theme .dev-company { color: white; }
+        .dev-name { font-size: 16px; color: var(--secondary-color); font-weight: bold; margin-bottom: 25px; width: 100%; }
+        
+        .dev-contact-list { list-style: none; padding: 0; margin-bottom: 30px; text-align: right; width: 100%; }
+        html[dir="ltr"] .dev-contact-list { text-align: left; }
+        .dev-contact-list li { margin-bottom: 15px; font-size: 15px; display: flex; align-items: center; gap: 10px; color: var(--text-color); }
+        .dev-contact-list li i { color: var(--primary-color); font-size: 18px; width: 20px; text-align: center; }
+        body.dark-theme .dev-contact-list li i { color: var(--secondary-color); }
+        .dev-contact-list li a { color: var(--text-color); text-decoration: none; font-weight: bold; transition: color 0.3s; }
+        .dev-contact-list li a:hover { color: var(--secondary-color); }
+
+        /* أزرار التواصل المضيئة */
+        .social-glow-container { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; width: 100%; }
+        .glow-btn {
+            width: 45px; height: 45px; border-radius: 50%;
+            background: #222; color: white;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 20px; text-decoration: none;
+            transition: all 0.4s ease; position: relative;
+        }
+        .glow-btn.facebook { background: #3b5998; box-shadow: 0 4px 10px rgba(59, 89, 152, 0.3); }
+        .glow-btn.facebook:hover { box-shadow: 0 0 20px #3b5998; transform: translateY(-5px) scale(1.1); }
+        .glow-btn.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); box-shadow: 0 4px 10px rgba(220, 39, 67, 0.3); }
+        .glow-btn.instagram:hover { box-shadow: 0 0 20px #dc2743; transform: translateY(-5px) scale(1.1); }
+        .glow-btn.whatsapp { background: #25d366; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); }
+        .glow-btn.whatsapp:hover { box-shadow: 0 0 20px #25d366; transform: translateY(-5px) scale(1.1); }
+        .glow-btn.x-twitter { background: #000; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); }
+        body.dark-theme .glow-btn.x-twitter { border-color: #555; }
+        .glow-btn.x-twitter:hover { box-shadow: 0 0 20px #fff; transform: translateY(-5px) scale(1.1); }
+
+        @keyframes pulseMenuBtn { 0% { transform: scale(1); box-shadow: 0 0 5px rgba(231, 76, 60, 0.4); } 100% { transform: scale(1.05); box-shadow: 0 0 15px rgba(231, 76, 60, 0.8); } }
+        @keyframes gradientAnim { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* 📱 التجاوب الجذري لشاشات الموبايل */
+        @media (max-width: 768px) {
+            header { padding: 10px 4%; }
+            .logo { font-size: 16px; }
+            .lang-toggle { font-size: 12px; padding: 4px 10px; }
+            .theme-toggle { font-size: 20px; }
+            .back-btn { font-size: 12px; padding: 6px 10px; }
+            .back-btn span { display: none; }
+            
+            .main-container { grid-template-columns: 1fr; margin: 20px auto; gap: 20px; }
+            .section-box { padding: 20px 15px; }
+            .section-box h2 { font-size: 18px; margin-bottom: 15px; }
+            .form-group label { font-size: 14px; }
+            .form-group input, .form-group select, .form-group textarea { padding: 10px 12px; font-size: 14px; }
+            .delivery-options { grid-template-columns: 1fr; gap: 10px; }
+            .delivery-box { padding: 10px; font-size: 14px; }
+            .summary-row { font-size: 14px; }
+            .summary-row.total { font-size: 18px; }
+            .submit-order-btn { font-size: 15px; padding: 12px; }
+            
+            .floating-main-btn { width: 45px; height: 45px; font-size: 20px; }
+            .floating-menu-list li a { font-size: 13px; padding: 8px 12px; }
+            .footer-copyright { font-size: 14px; }
+            .footer-dev { font-size: 13px; }
+        }
+        @media (max-width: 380px) {
+            .dev-modal { padding: 20px; height: 75vh; }
+            .dev-company { font-size: 24px; }
+            .dev-contact-list li { font-size: 13px; }
+            .dev-logo { width: 80px; height: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <a href="index.html" class="logo"><i class="fa-solid fa-book-open-reader"></i> <span id="headerLogoText">مكتبة البيان</span></a>
+        </div>
+        <div class="header-controls">
+            <div class="lang-toggle" id="langToggleBtn" title="تغيير اللغة / Switch Language">
+                <i class="fa-solid fa-language"></i>
+                <span id="langText">English</span>
+            </div>
+            <div class="theme-toggle" id="themeToggleBtn" title="تبديل مظهر الموقع">
+                <i class="fa-solid fa-moon"></i>
+            </div>
+            <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> <span id="backBtnText">العودة للموقع</span></a>
+        </div>
+    </header>
+
+    <!-- 🧭 الزر العائم للأقسام (Floating Menu) -->
+    <div class="floating-menu-container" id="floatingMenuContainer">
+        <div class="floating-main-btn" id="floatingMainBtn">
+            <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <ul class="floating-menu-list">
+            <li><a href="school.html"><i class="fa-solid fa-pencil"></i> <span class="fm-txt1">الأدوات المدرسية</span></a></li>
+            <li><a href="office.html"><i class="fa-solid fa-paperclip"></i> <span class="fm-txt2">الأدوات المكتبية</span></a></li>
+            <li><a href="gifts-antiques.html"><i class="fa-solid fa-gift"></i> <span class="fm-txt3">الهدايا والانتيكات</span></a></li>
+            <li><a href="games.html"><i class="fa-solid fa-gamepad"></i> <span class="fm-txt4">الألعاب</span></a></li>
+            <li><a href="gifts.html"><i class="fa-solid fa-box-open"></i> <span class="fm-txt5">قسم الهدايا</span></a></li>
+            <li><a href="books.html"><i class="fa-solid fa-book"></i> <span class="fm-txt6">الكتب والمذكرات</span></a></li>
+            <li><a href="printing.html"><i class="fa-solid fa-print"></i> <span class="fm-txt7">الطباعة والتصوير</span></a></li>
+            <li><a href="graphic-design.html"><i class="fa-solid fa-palette"></i> <span class="fm-txt8">التصاميم الجرافيك</span></a></li>
+            <li><a href="development.html"><i class="fa-solid fa-code"></i> <span class="fm-txt9">تطوير المواقع</span></a></li>
+            <li><a href="car-decoration.html"><i class="fa-solid fa-car"></i> <span class="fm-txt10">تزيين العربات</span></a></li>
+        </ul>
+    </div>
+
+    <div class="main-container">
+        
+        <div class="section-box">
+            <h2 id="shippingTitle"><i class="fa-solid fa-truck-ramp-box"></i> بيانات الشحن والاستلام</h2>
+            <form id="orderForm" onsubmit="confirmAndSendOrder(event)">
+                
+                <div class="form-group">
+                    <label for="custName" id="labelName">الاسم الكامل *</label>
+                    <input type="text" id="custName" required placeholder="أدخل اسمك الثلاثي لضمان دقة الطلب...">
+                </div>
+
+                <div class="form-group">
+                    <label for="custPhone" id="labelPhone">رقم الهاتف (الواتساب) *</label>
+                    <input type="tel" id="custPhone" required placeholder="مثال: 0912345678...">
+                </div>
+
+                <div class="form-group">
+                    <label id="labelDeliveryMethod">طريقة الاستلام المفضلة *</label>
+                    <div class="delivery-options">
+                        <div class="delivery-box selected" id="optDelivery" onclick="selectDelivery('توصيل للمنزل')">
+                            <i class="fa-solid fa-house-chimney" style="font-size:20px; margin-bottom:5px;"></i>
+                            <div id="delHomeText">توصيل للمنزل</div>
+                        </div>
+                        <div class="delivery-box" id="optPickup" onclick="selectDelivery('استلام من المكتبة')">
+                            <i class="fa-solid fa-shop" style="font-size:20px; margin-bottom:5px;"></i>
+                            <div id="delPickupText">استلام من المكتبة</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label id="labelPaymentMethod"><i class="fa-solid fa-building-columns"></i> طريقة الدفع (التحويل البنكي) *</label>
+                    <select id="paymentBank" required onchange="showBankDetails()">
+                        <option value="" disabled selected id="selectBankDefault">-- اختر البنك المراد التحويل إليه --</option>
+                        <option value="بنك الخرطوم" id="bank1">بنك الخرطوم</option>
+                        <option value="فوري" id="bank2">فوري</option>
+                        <option value="ساهل" id="bank3">ساهل</option>
+                        <option value="أوكاش" id="bank4">أوكاش</option>
+                    </select>
+
+                    <div class="bank-details-box" id="bankDetailsBox">
+                        <p><span id="labelAccName">اسم الحساب:</span> <strong id="displayAccName">عبد الله محمد سليمان</strong></p>
+                        <p><span id="labelAccNum">رقم الحساب:</span> <strong id="displayAccNum" style="font-size: 18px; letter-spacing: 2px;"></strong></p>
+                        <div class="receipt-warning">
+                            <i class="fa-solid fa-camera"></i>
+                            <span id="receiptWarningText">مهم: يرجى أخذ لقطة شاشة (Screenshot) للإشعار وإرسالها في الواتساب بعد الضغط على زر الإرسال بالأسفل.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="addressGroup">
+                    <label for="custAddress" id="labelAddress">العنوان بالتفصيل *</label>
+                    <textarea id="custAddress" rows="3" required placeholder="المدينة، الحي، اسم الشارع، أو أقرب معلم مشهور..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="custNotes" id="labelNotes">ملاحظات إضافية للطلب (اختياري)</label>
+                    <textarea id="custNotes" rows="2" placeholder="أي تفاصيل إضافية تريد إخبارنا بها بخصوص طلبك..."></textarea>
+                </div>
+
+            </form>
+        </div>
+
+        <div class="section-box" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <h2 id="invoiceTitle"><i class="fa-solid fa-file-invoice-dollar"></i> مراجعة الفاتورة</h2>
+                
+                <div class="invoice-items" id="invoiceItemsContainer">
+                    <!-- سيتم تحميل المنتجات هنا -->
+                </div>
+            </div>
+
+            <div>
+                <div class="summary-row">
+                    <span id="sumItemsText">إجمالي المنتجات:</span>
+                    <span id="subTotal">0 ج.س</span>
+                </div>
+                <div class="summary-row" id="shippingRow">
+                    <span id="sumShippingText">رسوم التوصيل:</span>
+                    <span id="shippingFee">تحدد لاحقاً</span>
+                </div>
+                <div class="summary-row total">
+                    <span id="sumTotalText">الإجمالي الكلي:</span>
+                    <span class="price" id="finalTotal">0 ج.س</span>
+                </div>
+
+                <button type="submit" form="orderForm" class="submit-order-btn">
+                    <i class="fa-brands fa-whatsapp"></i> <span id="submitBtnText">إرسال الطلب وإرفاق الإشعار</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🌟 الزيل الثنائي (Dual Footer) -->
+    <footer class="dual-footer">
+        <div class="footer-copyright" id="footerCopy">© جميع الحقوق والنشر محفوظة لمكتبة البيان 2026</div>
+        <div class="footer-dev" id="openDevModalBtn">
+            <i class="fa-solid fa-code"></i> <span id="footerDevTxt">تم التطوير بواسطة كلاود أرت - CLOUD ART</span>
+        </div>
+    </footer>
+
+    <!-- 💻 شاشة المطور المنبثقة -->
+    <div class="dev-modal-overlay" id="devModalOverlay">
+        <div class="dev-modal">
+            <i class="fa-solid fa-xmark close-dev-modal" id="closeDevModalBtn"></i>
+            
+            <div class="dev-logo">
+                <img src="me.jpg" alt="شعار المطور">
+            </div>
+
+            <div class="dev-company">CLOUD ART</div>
+            <div class="dev-name" id="devNameTxt">م. الرشيد كمال عزالدين</div>
+            
+            <ul class="dev-contact-list">
+                <li><i class="fa-brands fa-whatsapp"></i> <span id="txtWhatsapp">واتساب:</span> <a href="https://wa.me/249114657143" target="_blank" dir="ltr">0114657143</a></li>
+                <li><i class="fa-solid fa-phone"></i> <span id="txtCall">مكالمات:</span> <a href="tel:0964275052" dir="ltr">0964275052</a></li>
+                <li><i class="fa-solid fa-envelope"></i> <span id="txtEmail">البريد:</span> <a href="mailto:alrsheedkamal6003@gamil.com">alrsheedkamal6003@gamil.com</a></li>
+            </ul>
+
+            <div class="social-glow-container">
+                <a href="#" target="_blank" class="glow-btn facebook" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="#" target="_blank" class="glow-btn instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://wa.me/249114657143" target="_blank" class="glow-btn whatsapp" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                <a href="#" target="_blank" class="glow-btn x-twitter" title="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // -----------------------------------------------------------------
+        // ⚙️ رقم الواتساب المباشر (مخفي داخل الكود)
+        // -----------------------------------------------------------------
+        const whatsappNumber = "249911787325"; 
+        
+        let cart = JSON.parse(localStorage.getItem('albayan_cart')) || [];
+        let currentLang = localStorage.getItem('albayan_lang') || 'ar';
+        let chosenDeliveryMethod = "توصيل للمنزل";
+
+        // 🏦 بيانات الحسابات البنكية 
+        const bankAccounts = {
+            "بنك الخرطوم": "6812181",
+            "فوري": "50620106",
+            "ساهل": "82487",
+            "أوكاش": "0971979"
+        };
+        const accountOwnerName = "عبد الله محمد سليمان";
+
+        // 🌐 قاموس الترجمة الشامل
+        const localizationDict = {
+            "ar": {
+                "headerLogoText": "مكتبة البيان",
+                "langText": "English",
+                "backBtnText": "العودة للموقع",
+                "shippingTitle": "<i class='fa-solid fa-truck-ramp-box'></i> بيانات الشحن والاستلام",
+                "labelName": "الاسم الكامل *", "phName": "أدخل اسمك الثلاثي لضمان دقة الطلب...",
+                "labelPhone": "رقم الهاتف (الواتساب) *", "phPhone": "مثال: 0912345678...",
+                "labelDeliveryMethod": "طريقة الاستلام المفضلة *",
+                "delHomeText": "توصيل للمنزل", "delPickupText": "استلام من المكتبة",
+                "labelPaymentMethod": "<i class='fa-solid fa-building-columns'></i> طريقة الدفع (التحويل البنكي) *",
+                "selectBankDefault": "-- اختر البنك المراد التحويل إليه --",
+                "bank1": "بنك الخرطوم", "bank2": "فوري", "bank3": "ساهل", "bank4": "أوكاش",
+                "labelAccName": "اسم الحساب:", "labelAccNum": "رقم الحساب:",
+                "receiptWarningText": "مهم: يرجى أخذ لقطة شاشة (Screenshot) للإشعار وإرسالها في الواتساب بعد الضغط على زر الإرسال بالأسفل.",
+                "labelAddress": "العنوان بالتفصيل *", "phAddress": "المدينة، الحي، اسم الشارع، أو أقرب معلم مشهور...",
+                "labelNotes": "ملاحظات إضافية للطلب (اختياري)", "phNotes": "أي تفاصيل إضافية تريد إخبارنا بها بخصوص طلبك...",
+                "invoiceTitle": "<i class='fa-solid fa-file-invoice-dollar'></i> مراجعة الفاتورة",
+                "sumItemsText": "إجمالي المنتجات:",
+                "sumShippingText": "رسوم التوصيل:",
+                "feeTBD": "تحدد لاحقاً", "feeFree": "مجاني",
+                "sumTotalText": "الإجمالي الكلي:",
+                "submitBtnText": "إرسال الطلب وإرفاق الإشعار",
+                "emptyCartAlert": "السلة فارغة حالياً! يرجى العودة وإضافة منتجات.",
+                "currency": "ج.س", "qtyText": "الكمية:", "priceText": "سعر الوحدة:",
+                "footerCopy": "© جميع الحقوق والنشر محفوظة لمكتبة البيان 2026",
+                "footerDevTxt": "تم التطوير بواسطة كلاود أرت - CLOUD ART",
+                "devNameTxt": "م. الرشيد كمال عزالدين",
+                "txtWhatsapp": "واتساب:", "txtCall": "مكالمات:", "txtEmail": "البريد:",
+                "fmTxt1": "الأدوات المدرسية", "fmTxt2": "الأدوات المكتبية", "fmTxt3": "الهدايا والانتيكات",
+                "fmTxt4": "الألعاب", "fmTxt5": "قسم الهدايا", "fmTxt6": "الكتب والمذكرات",
+                "fmTxt7": "الطباعة والتصوير", "fmTxt8": "التصاميم الجرافيك", "fmTxt9": "تطوير المواقع",
+                "fmTxt10": "تزيين العربات"
+            },
+            "en": {
+                "headerLogoText": "Al-Bayan Library",
+                "langText": "العربية",
+                "backBtnText": "Back to Store",
+                "shippingTitle": "<i class='fa-solid fa-truck-ramp-box'></i> Shipping & Delivery Details",
+                "labelName": "Full Name *", "phName": "Enter your full name to ensure order accuracy...",
+                "labelPhone": "Phone Number (WhatsApp) *", "phPhone": "Example: 0912345678...",
+                "labelDeliveryMethod": "Preferred Delivery Method *",
+                "delHomeText": "Home Delivery", "delPickupText": "Store Pickup",
+                "labelPaymentMethod": "<i class='fa-solid fa-building-columns'></i> Payment Method (Bank Transfer) *",
+                "selectBankDefault": "-- Select the bank to transfer to --",
+                "bank1": "Bank of Khartoum", "bank2": "Fawry", "bank3": "Sahel", "bank4": "OCash",
+                "labelAccName": "Account Name:", "labelAccNum": "Account Number:",
+                "receiptWarningText": "IMPORTANT: Please take a screenshot of the transfer receipt and send it in WhatsApp after clicking submit.",
+                "labelAddress": "Detailed Address *", "phAddress": "City, Neighborhood, Street Name, or nearest landmark...",
+                "labelNotes": "Additional Order Notes (Optional)", "phNotes": "Any additional details you want to tell us about your order...",
+                "invoiceTitle": "<i class='fa-solid fa-file-invoice-dollar'></i> Invoice Review",
+                "sumItemsText": "Total Products:",
+                "sumShippingText": "Shipping Fee:",
+                "feeTBD": "To be determined", "feeFree": "Free",
+                "sumTotalText": "Grand Total:",
+                "submitBtnText": "Submit Order & Attach Receipt",
+                "emptyCartAlert": "Your cart is currently empty! Please go back and add products.",
+                "currency": "SDG", "qtyText": "Qty:", "priceText": "Unit Price:",
+                "footerCopy": "© All rights reserved for Al-Bayan Library 2026",
+                "footerDevTxt": "Developed by CLOUD ART",
+                "devNameTxt": "Eng. Al-Rasheed Kamal Ezz El-Din",
+                "txtWhatsapp": "WhatsApp:", "txtCall": "Calls:", "txtEmail": "Email:",
+                "fmTxt1": "School Supplies", "fmTxt2": "Office Supplies", "fmTxt3": "Gifts & Antiques",
+                "fmTxt4": "Games", "fmTxt5": "Gifts Section", "fmTxt6": "Books & Notes",
+                "fmTxt7": "Printing & Copying", "fmTxt8": "Graphic Design", "fmTxt9": "Web Development",
+                "fmTxt10": "Car Decoration"
+            }
+        };
+
+        const invoiceItemsContainer = document.getElementById('invoiceItemsContainer');
+        const subTotalElement = document.getElementById('subTotal');
+        const finalTotalElement = document.getElementById('finalTotal');
+        const addressGroup = document.getElementById('addressGroup');
+        const custAddress = document.getElementById('custAddress');
+        const shippingFeeElement = document.getElementById('shippingFee');
+
+        // إظهار بيانات البنك بعد التحديد
+        function showBankDetails() {
+            const bankSelect = document.getElementById('paymentBank');
+            const selectedBank = bankSelect.value;
+            const detailsBox = document.getElementById('bankDetailsBox');
+            const displayAccNum = document.getElementById('displayAccNum');
+
+            if (selectedBank && bankAccounts[selectedBank]) {
+                displayAccNum.innerText = bankAccounts[selectedBank];
+                detailsBox.style.display = 'block';
+            } else {
+                detailsBox.style.display = 'none';
+            }
+        }
+
+        // 🌐 تفعيل لغة الواجهة
+        const langToggleBtn = document.getElementById('langToggleBtn');
+
+        function applyLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('albayan_lang', lang);
+            
+            if (lang === 'en') {
+                document.documentElement.dir = 'ltr';
+                document.documentElement.lang = 'en';
+            } else {
+                document.documentElement.dir = 'rtl';
+                document.documentElement.lang = 'ar';
+            }
+
+            const dict = localizationDict[lang];
+            
+            document.getElementById('headerLogoText').innerText = dict.headerLogoText;
+            document.getElementById('langText').innerText = dict.langText;
+            document.getElementById('backBtnText').innerText = dict.backBtnText;
+            document.getElementById('shippingTitle').innerHTML = dict.shippingTitle;
+            document.getElementById('labelName').innerText = dict.labelName;
+            document.getElementById('custName').placeholder = dict.phName;
+            document.getElementById('labelPhone').innerText = dict.labelPhone;
+            document.getElementById('custPhone').placeholder = dict.phPhone;
+            document.getElementById('labelDeliveryMethod').innerText = dict.labelDeliveryMethod;
+            document.getElementById('delHomeText').innerText = dict.delHomeText;
+            document.getElementById('delPickupText').innerText = dict.delPickupText;
+            document.getElementById('labelPaymentMethod').innerHTML = dict.labelPaymentMethod;
+            document.getElementById('selectBankDefault').innerText = dict.selectBankDefault;
+            document.getElementById('bank1').innerText = dict.bank1;
+            document.getElementById('bank2').innerText = dict.bank2;
+            document.getElementById('bank3').innerText = dict.bank3;
+            document.getElementById('bank4').innerText = dict.bank4;
+            document.getElementById('labelAccName').innerText = dict.labelAccName;
+            document.getElementById('labelAccNum').innerText = dict.labelAccNum;
+            document.getElementById('receiptWarningText').innerText = dict.receiptWarningText;
+            document.getElementById('labelAddress').innerText = dict.labelAddress;
+            document.getElementById('custAddress').placeholder = dict.phAddress;
+            document.getElementById('labelNotes').innerText = dict.labelNotes;
+            document.getElementById('custNotes').placeholder = dict.phNotes;
+            document.getElementById('invoiceTitle').innerHTML = dict.invoiceTitle;
+            document.getElementById('sumItemsText').innerText = dict.sumItemsText;
+            document.getElementById('sumShippingText').innerText = dict.sumShippingText;
+            document.getElementById('sumTotalText').innerText = dict.sumTotalText;
+            document.getElementById('submitBtnText').innerText = dict.submitBtnText;
+
+            // ترجمة الزر العائم
+            document.querySelector('.fm-txt1').innerText = dict.fmTxt1;
+            document.querySelector('.fm-txt2').innerText = dict.fmTxt2;
+            document.querySelector('.fm-txt3').innerText = dict.fmTxt3;
+            document.querySelector('.fm-txt4').innerText = dict.fmTxt4;
+            document.querySelector('.fm-txt5').innerText = dict.fmTxt5;
+            document.querySelector('.fm-txt6').innerText = dict.fmTxt6;
+            document.querySelector('.fm-txt7').innerText = dict.fmTxt7;
+            document.querySelector('.fm-txt8').innerText = dict.fmTxt8;
+            document.querySelector('.fm-txt9').innerText = dict.fmTxt9;
+            document.querySelector('.fm-txt10').innerText = dict.fmTxt10;
+
+            // ترجمة الزيل
+            document.getElementById('footerCopy').innerText = dict.footerCopy;
+            document.getElementById('footerDevTxt').innerText = dict.footerDevTxt;
+            document.getElementById('devNameTxt').innerText = dict.devNameTxt;
+            document.getElementById('txtWhatsapp').innerText = dict.txtWhatsapp;
+            document.getElementById('txtCall').innerText = dict.txtCall;
+            document.getElementById('txtEmail').innerText = dict.txtEmail;
+
+            if(chosenDeliveryMethod === 'توصيل للمنزل' || chosenDeliveryMethod === 'Home Delivery') {
+                chosenDeliveryMethod = dict.delHomeText;
+                shippingFeeElement.innerText = dict.feeTBD;
+            } else {
+                chosenDeliveryMethod = dict.delPickupText;
+                shippingFeeElement.innerText = dict.feeFree;
+            }
+
+            document.getElementById('displayAccName').innerText = lang === 'en' ? "Abdullah Mohammed Suliman" : accountOwnerName;
+
+            loadInvoiceUI(); 
+        }
+
+        langToggleBtn.addEventListener('click', () => {
+            let targetLang = currentLang === 'ar' ? 'en' : 'ar';
+            applyLanguage(targetLang);
+        });
+
+        // 🌗 تفعيل الوضع الداكن الفاخر
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = themeToggleBtn.querySelector('i');
+        
+        if (localStorage.getItem('albayan_theme') === 'dark') {
+            document.body.classList.add('dark-theme');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            if (document.body.classList.contains('dark-theme')) {
+                localStorage.setItem('albayan_theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                localStorage.setItem('albayan_theme', 'light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+
+        // 🧭 تفعيل الزر العائم للأقسام
+        const floatingMainBtn = document.getElementById('floatingMainBtn');
+        const floatingMenuContainer = document.getElementById('floatingMenuContainer');
+
+        floatingMainBtn.addEventListener('click', () => {
+            floatingMenuContainer.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!floatingMenuContainer.contains(e.target) && floatingMenuContainer.classList.contains('active')) {
+                floatingMenuContainer.classList.remove('active');
+            }
+        });
+
+        // 💻 تفعيل شاشة المطور المنبثقة
+        const openDevModalBtn = document.getElementById('openDevModalBtn');
+        const devModalOverlay = document.getElementById('devModalOverlay');
+        const closeDevModalBtn = document.getElementById('closeDevModalBtn');
+
+        openDevModalBtn.addEventListener('click', () => {
+            devModalOverlay.classList.add('show');
+        });
+        closeDevModalBtn.addEventListener('click', () => {
+            devModalOverlay.classList.remove('show');
+        });
+        devModalOverlay.addEventListener('click', (e) => {
+            if (e.target === devModalOverlay) {
+                devModalOverlay.classList.remove('show');
+            }
+        });
+
+        // تحميل الفاتورة (حل مشكلة undefined جذرياً)
+        function loadInvoiceUI() {
+            const dict = localizationDict[currentLang];
+
+            if(cart.length === 0) {
+                invoiceItemsContainer.innerHTML = `<div class="empty-cart-alert">${dict.emptyCartAlert}</div>`;
+                subTotalElement.innerText = `0 ${dict.currency}`;
+                finalTotalElement.innerText = `0 ${dict.currency}`;
+                return;
+            }
+
+            invoiceItemsContainer.innerHTML = '';
+            let totalMoney = 0;
+
+            cart.forEach(item => {
+                let itemTotal = item.price * item.qty;
+                totalMoney += itemTotal;
+                
+                // الحل الجذري لمنع ظهور Undefined
+                let itemNameAr = item.nameAr || item.name || "منتج غير معروف";
+                let itemNameEn = item.nameEn || item.name || "Unknown Product";
+                let itemName = currentLang === 'ar' ? itemNameAr : itemNameEn;
+                
+                invoiceItemsContainer.innerHTML += `
+                    <div class="invoice-item">
+                        <img src="${item.img}" alt="${itemName}">
+                        <div class="invoice-item-info">
+                            <div class="invoice-item-name">${itemName}</div>
+                            <div class="invoice-item-qty">${dict.qtyText} ${item.qty} | ${dict.priceText} ${item.price.toLocaleString()} ${dict.currency}</div>
+                        </div>
+                        <div class="invoice-item-price">${itemTotal.toLocaleString()} ${dict.currency}</div>
+                    </div>
+                `;
+            });
+
+            subTotalElement.innerText = `${totalMoney.toLocaleString()} ${dict.currency}`;
+            finalTotalElement.innerText = `${totalMoney.toLocaleString()} ${dict.currency}`;
+        }
+
+        // اختيار الاستلام
+        function selectDelivery(methodAr) {
+            const dict = localizationDict[currentLang];
+            document.getElementById('optDelivery').classList.remove('selected');
+            document.getElementById('optPickup').classList.remove('selected');
+
+            if(methodAr === 'توصيل للمنزل') {
+                chosenDeliveryMethod = dict.delHomeText;
+                document.getElementById('optDelivery').classList.add('selected');
+                addressGroup.style.display = 'block';
+                custAddress.required = true;
+                shippingFeeElement.innerText = dict.feeTBD;
+            } else {
+                chosenDeliveryMethod = dict.delPickupText;
+                document.getElementById('optPickup').classList.add('selected');
+                addressGroup.style.display = 'none';
+                custAddress.required = false;
+                shippingFeeElement.innerText = dict.feeFree;
+            }
+        }
+
+        // إرسال الفاتورة المنظمة
+        function confirmAndSendOrder(event) {
+            event.preventDefault();
+            const dict = localizationDict[currentLang];
+
+            if(cart.length === 0) {
+                alert(currentLang === 'ar' ? 'سلتك فارغة، لا يوجد طلب لإرساله!' : 'Your cart is empty, no order to send!');
+                return;
+            }
+
+            const name = document.getElementById('custName').value;
+            const phone = document.getElementById('custPhone').value;
+            const address = custAddress.value;
+            const notes = document.getElementById('custNotes').value;
+            
+            const bankSelect = document.getElementById('paymentBank');
+            const selectedBank = bankSelect.options[bankSelect.selectedIndex].text;
+
+            let message = currentLang === 'ar' ? `📋 *فاتورة طلب جديدة من مكتبة البيان* 📋\n\n` : `📋 *New Order Invoice from Al-Bayan Library* 📋\n\n`;
+            
+            if(currentLang === 'ar') {
+                message += `👤 *بيانات العميل:*\n`;
+                message += ` 📝 الاسم: ${name}\n`;
+                message += ` 📞 الهاتف: ${phone}\n`;
+                message += ` 🚚 الاستلام: ${chosenDeliveryMethod}\n`;
+                if(chosenDeliveryMethod === dict.delHomeText) {
+                    message += ` 📍 العنوان: ${address}\n`;
+                }
+                message += ` 💳 تم التحويل عبر: ${selectedBank}\n`;
+                if(notes.trim() !== '') {
+                    message += ` ✉️ ملاحظات: ${notes}\n`;
+                }
+                message += `\n-------------------------\n`;
+                message += `🛒 *المنتجات المطلوبة:*\n`;
+            } else {
+                message += `👤 *Customer Details:*\n`;
+                message += ` 📝 Name: ${name}\n`;
+                message += ` 📞 Phone: ${phone}\n`;
+                message += ` 🚚 Delivery: ${chosenDeliveryMethod}\n`;
+                if(chosenDeliveryMethod === dict.delHomeText) {
+                    message += ` 📍 Address: ${address}\n`;
+                }
+                message += ` 💳 Transferred via: ${selectedBank}\n`;
+                if(notes.trim() !== '') {
+                    message += ` ✉️ Notes: ${notes}\n`;
+                }
+                message += `\n-------------------------\n`;
+                message += `🛒 *Products List:*\n`;
+            }
+
+            let totalMoney = 0;
+            cart.forEach((item, index) => {
+                let itemTotal = item.price * item.qty;
+                totalMoney += itemTotal;
+                
+                // الحل الجذري لمنع ظهور Undefined في رسالة الواتساب
+                let itemNameAr = item.nameAr || item.name || "منتج غير معروف";
+                let itemNameEn = item.nameEn || item.name || "Unknown Product";
+                let itemName = currentLang === 'ar' ? itemNameAr : itemNameEn;
+                
+                if(currentLang === 'ar'){
+                    message += `${index + 1}) *${itemName}*\n   الكمية: ${item.qty} | المجموع: ${itemTotal.toLocaleString()} ج.س\n`;
+                } else {
+                    message += `${index + 1}) *${itemName}*\n   Qty: ${item.qty} | Total: ${itemTotal.toLocaleString()} SDG\n`;
+                }
+            });
+
+            message += `-------------------------\n`;
+            
+            if(currentLang === 'ar'){
+                message += `💰 *الإجمالي الكلي:* ${totalMoney.toLocaleString()} ج.س\n`;
+                if(chosenDeliveryMethod === dict.delPickupText) {
+                    message += `🚚 *التوصيل:* مجاني (استلام من الموقع)\n`;
+                } else {
+                    message += `🚚 *التوصيل:* يحدد لاحقاً حسب العنوان\n`;
+                }
+                message += `\n📸 *مرفق مع هذه الرسالة صورة إشعار التحويل لتأكيد الطلب.*`;
+            } else {
+                message += `💰 *Grand Total:* ${totalMoney.toLocaleString()} SDG\n`;
+                if(chosenDeliveryMethod === dict.delPickupText) {
+                    message += `🚚 *Shipping:* Free (Store Pickup)\n`;
+                } else {
+                    message += `🚚 *Shipping:* TBD based on address\n`;
+                }
+                message += `\n📸 *The transfer receipt screenshot is attached with this message to confirm the order.*`;
+            }
+
+            // إرسال الطلب للرقم المخفي
+            let whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        window.onload = function() {
+            applyLanguage(currentLang);
+        };
+    </script>
+</body>
+</html>
