@@ -37,7 +37,6 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* ===== الوضع الداكن ===== */
         body.dark-theme {
             --bg-color: #131c24;
             --text-color: #f5f6fa;
@@ -313,7 +312,7 @@
             border-color: var(--secondary-color);
         }
 
-        /* ===== رفع الصور بالسحب والإفلات (الجزء الجديد) ===== */
+        /* ===== منطقة رفع الصور (السحب والإفلات) ===== */
         .upload-area {
             border: 3px dashed var(--upload-border);
             border-radius: 12px;
@@ -361,6 +360,7 @@
             opacity: 0;
             cursor: pointer;
         }
+
         .upload-preview {
             margin-top: 12px;
             display: none;
@@ -405,6 +405,7 @@
         .upload-preview .remove-file:hover {
             background: rgba(231, 76, 60, 0.15);
         }
+
         .upload-progress {
             display: none;
             width: 100%;
@@ -430,11 +431,23 @@
             margin-top: 4px;
             text-align: center;
         }
-        /* إخفاء حقل الرابط ولكن نحتفظ به في الخلفية */
-        .url-hidden-field {
+
+        /* ===== حقل الرابط الاحتياطي ===== */
+        .url-fallback-group {
             display: none;
+            margin-top: 10px;
+        }
+        .url-fallback-group label {
+            font-weight: 400;
+            font-size: 13px;
+            color: #e67e22;
+        }
+        .url-fallback-group input {
+            direction: ltr;
+            text-align: left;
         }
 
+        /* ===== الأزرار ===== */
         .btn-container {
             display: flex;
             gap: 10px;
@@ -575,7 +588,7 @@
             background-color: #e74c3c;
         }
 
-        /* ===== تحريك ===== */
+        /* ===== حركات ===== */
         @keyframes pulseGlow {
             0% {
                 transform: scale(1);
@@ -767,11 +780,10 @@
                         <input type="number" id="prodPrice" required placeholder="0" />
                     </div>
 
-                    <!-- ===== حقل رفع الصور الجديد (بالسحب والإفلات) ===== -->
+                    <!-- ===== رفع الصور ===== -->
                     <div class="form-group">
                         <label id="lblFormImg">صورة المنتج <span style="font-weight:400;font-size:13px;color:#7f8c8d;">(اسحب الصورة أو انقر للاختيار)</span></label>
 
-                        <!-- منطقة السحب والإفلات -->
                         <div class="upload-area" id="uploadArea">
                             <i class="fa-regular fa-image upload-icon"></i>
                             <div class="upload-text" id="uploadText">اسحب الصورة هنا أو انقر للاختيار</div>
@@ -779,7 +791,6 @@
                             <input type="file" id="fileInput" accept="image/*" />
                         </div>
 
-                        <!-- معاينة الصورة + معلومات الملف -->
                         <div class="upload-preview" id="uploadPreview">
                             <img id="previewImg" src="" alt="معاينة" />
                             <div class="file-info">
@@ -789,7 +800,6 @@
                             <span class="remove-file" id="removeFileBtn" title="إزالة الصورة"><i class="fa-solid fa-xmark"></i></span>
                         </div>
 
-                        <!-- شريط التقدم -->
                         <div class="upload-progress" id="uploadProgress">
                             <div class="progress-bar">
                                 <div class="progress-fill" id="progressFill"></div>
@@ -797,8 +807,15 @@
                             <div class="progress-text" id="progressText">جاري الرفع ... 0%</div>
                         </div>
 
-                        <!-- حقل الرابط المخفي (يتم تعبئته تلقائياً) -->
-                        <input type="url" id="prodImg" class="url-hidden-field" required />
+                        <!-- ===== حقل الرابط الأساسي (مخفي) ===== -->
+                        <input type="url" id="prodImg" class="url-hidden-field" required style="display:none;" />
+
+                        <!-- ===== حقل الرابط الاحتياطي (يظهر عند فشل الرفع) ===== -->
+                        <div class="url-fallback-group" id="urlFallbackGroup">
+                            <label for="prodImgFallback"><i class="fa-regular fa-circle-exclamation" style="color:#e67e22;"></i> في حال فشل الرفع، يمكنك لصق رابط الصورة يدوياً:</label>
+                            <input type="url" id="prodImgFallback" placeholder="https://example.com/image.jpg" />
+                            <div style="font-size:12px; color:#7f8c8d; margin-top:4px;">سيتم استخدام هذا الرابط بدلاً من الرفع التلقائي.</div>
+                        </div>
                     </div>
 
                     <div class="btn-container">
@@ -833,10 +850,10 @@
     </main>
 
     <!-- ============================================================ -->
-    <!-- ===== Firebase + منطق التطبيق (ES Module) ===== -->
+    <!-- ===== Firebase + ImgBB (بديل التخزين) ===== -->
     <!-- ============================================================ -->
     <script type="module">
-        // ===== استيراد Firebase =====
+        // ===== استيراد Firebase (فقط Firestore، بدون Storage) =====
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
         import {
             getFirestore,
@@ -847,13 +864,6 @@
             updateDoc,
             deleteDoc
         } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
-        import {
-            getStorage,
-            ref,
-            uploadBytesResumable,
-            getDownloadURL,
-            deleteObject
-        } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-storage.js";
 
         // ===== إعداد Firebase =====
         const firebaseConfig = {
@@ -868,16 +878,18 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const storage = getStorage(app);
         const productsCollection = collection(db, 'Products');
+
+        // ===== مفتاح ImgBB (مجاني، احصل على مفتاحك من api.imgbb.com) =====
+        // يمكنك استبدال هذا المفتاح بمفتاحك الشخصي
+        const IMGBB_API_KEY = '6d207e02198a847aa8d0a2a901fa8ebd'; // مفتاح تجريبي عام
 
         // ===== متغيرات الحالة العامة =====
         let currentLang = localStorage.getItem('albayan_lang') || 'ar';
         let editMode = false;
         let currentEditKey = null;
         let globalProductsArray = [];
-        let uploadedFileURL = ''; // رابط الصورة المرفوعة
-        let uploadTask = null; // مهمة الرفع الحالية
+        let uploadedFileURL = '';
         let isUploading = false;
 
         // ===== القاموس اللغوي =====
@@ -908,7 +920,7 @@
                 uploadHint: 'يدعم JPG, PNG, WEBP, GIF',
                 uploading: 'جاري الرفع ...',
                 uploadSuccess: 'تم رفع الصورة بنجاح!',
-                uploadFail: 'فشل رفع الصورة، حاول مرة أخرى.',
+                uploadFail: 'فشل رفع الصورة، حاول مرة أخرى أو استخدم الرابط اليدوي.',
                 removeImage: 'إزالة الصورة',
                 noProducts: 'لا يوجد منتجات في هذا القسم.',
                 confirmDelete: 'هل أنت متأكد تماماً من حذف هذا المنتج؟',
@@ -916,6 +928,8 @@
                 updateSuccess: 'تم تحديث بيانات المنتج بنجاح!',
                 addSuccess: 'تمت إضافة المنتج بنجاح إلى شاشة العرض!',
                 passError: 'كلمة المرور خاطئة، يرجى المحاولة مرة أخرى!',
+                fallbackLabel: 'في حال فشل الرفع، يمكنك لصق رابط الصورة يدوياً:',
+                fallbackHint: 'سيتم استخدام هذا الرابط بدلاً من الرفع التلقائي.'
             },
             en: {
                 splashTitle: 'Al-Bayan Library',
@@ -943,7 +957,7 @@
                 uploadHint: 'Supports JPG, PNG, WEBP, GIF',
                 uploading: 'Uploading ...',
                 uploadSuccess: 'Image uploaded successfully!',
-                uploadFail: 'Upload failed, please try again.',
+                uploadFail: 'Upload failed, please try again or use manual link.',
                 removeImage: 'Remove image',
                 noProducts: 'No products found in this section.',
                 confirmDelete: 'Are you sure you want to delete this product?',
@@ -951,20 +965,21 @@
                 updateSuccess: 'Product updated successfully!',
                 addSuccess: 'Product added successfully to showcase page!',
                 passError: 'Incorrect password, please try again!',
+                fallbackLabel: 'If upload fails, you can paste the image URL manually:',
+                fallbackHint: 'This URL will be used instead of auto-upload.'
             }
         };
 
-        // ===== دالة الترجمات =====
         function t(key) {
             return localizationDict[currentLang]?.[key] || key;
         }
 
-        // ===== إظهار/إخفاء شاشة البداية =====
+        // ===== شاشة البداية =====
         setTimeout(() => {
             document.getElementById('splashScreen').classList.add('fade-out');
         }, 1500);
 
-        // ===== تبديل الثيم =====
+        // ===== الثيم =====
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         const themeIcon = themeToggleBtn.querySelector('i');
         if (localStorage.getItem('albayan_theme') === 'dark') {
@@ -982,7 +997,7 @@
             }
         });
 
-        // ===== تطبيق اللغة =====
+        // ===== اللغة =====
         window.applyLanguage = function(lang) {
             currentLang = lang;
             localStorage.setItem('albayan_lang', lang);
@@ -1011,18 +1026,16 @@
             document.getElementById('uploadText').innerText = t('uploadText');
             document.querySelector('.upload-hint').innerText = t('uploadHint');
 
-            // تحديث خيارات الفلتر
             const filterSelect = document.getElementById('filterCategory');
-            if (filterSelect) {
-                filterSelect.options[0].text = t('allCats');
-            }
+            if (filterSelect) filterSelect.options[0].text = t('allCats');
 
-            if (typeof window.loadAdminProducts === 'function') {
-                window.loadAdminProducts();
-            }
+            document.querySelector('.url-fallback-group label').innerHTML =
+                `<i class="fa-regular fa-circle-exclamation" style="color:#e67e22;"></i> ${t('fallbackLabel')}`;
+            document.querySelector('.url-fallback-group div:last-child').innerText = t('fallbackHint');
+
+            if (typeof window.loadAdminProducts === 'function') window.loadAdminProducts();
         };
 
-        // ===== زر تبديل اللغة =====
         document.getElementById('langToggleBtn').addEventListener('click', () => {
             window.applyLanguage(currentLang === 'ar' ? 'en' : 'ar');
         });
@@ -1040,10 +1053,6 @@
 
         window.logoutAdmin = function() {
             sessionStorage.removeItem('admin_session');
-            // إلغاء أي رفع جارٍ
-            if (uploadTask) {
-                try { uploadTask.cancel(); } catch (_) {}
-            }
             checkSession();
         };
 
@@ -1060,18 +1069,16 @@
             }
         }
 
-        // ===== الاستماع لتغييرات Firestore =====
+        // ===== الاستماع لقاعدة البيانات =====
         onSnapshot(productsCollection, (snapshot) => {
             globalProductsArray = [];
             snapshot.forEach((doc) => {
                 globalProductsArray.push({ key: doc.id, ...doc.data() });
             });
-            if (typeof window.loadAdminProducts === 'function') {
-                window.loadAdminProducts();
-            }
+            if (typeof window.loadAdminProducts === 'function') window.loadAdminProducts();
         });
 
-        // ===== عرض المنتجات في لوحة الإدارة =====
+        // ===== عرض المنتجات =====
         window.loadAdminProducts = function() {
             const listContainer = document.getElementById('adminProductsList');
             listContainer.innerHTML = '';
@@ -1109,7 +1116,7 @@
         };
 
         // ================================================================
-        // ===== رفع الصور إلى Firebase Storage (السحب والإفلات) =====
+        // ===== رفع الصور عبر ImgBB (بديل Firebase Storage) =====
         // ================================================================
 
         const uploadArea = document.getElementById('uploadArea');
@@ -1123,8 +1130,10 @@
         const progressText = document.getElementById('progressText');
         const removeFileBtn = document.getElementById('removeFileBtn');
         const prodImgInput = document.getElementById('prodImg');
+        const prodImgFallback = document.getElementById('prodImgFallback');
+        const urlFallbackGroup = document.getElementById('urlFallbackGroup');
 
-        // ---- سحب وإفلات ----
+        // ---- أحداث السحب والإفلات ----
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.classList.add('dragover');
@@ -1135,9 +1144,8 @@
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
             uploadArea.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFile(files[0]);
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
             }
         });
         fileInput.addEventListener('change', (e) => {
@@ -1146,20 +1154,18 @@
             }
         });
 
-        // ---- معالجة الملف المختار ----
+        // ---- معالجة الملف ورفعه إلى ImgBB ----
         function handleFile(file) {
-            // التحقق من نوع الملف
             if (!file.type.startsWith('image/')) {
                 alert(currentLang === 'ar' ? 'الرجاء اختيار ملف صورة فقط.' : 'Please select an image file.');
                 return;
             }
-            // التحقق من الحجم (حد أقصى 5 ميجابايت)
             if (file.size > 5 * 1024 * 1024) {
                 alert(currentLang === 'ar' ? 'حجم الصورة كبير جداً (الحد الأقصى 5 ميجابايت).' : 'Image size is too large (max 5MB).');
                 return;
             }
 
-            // عرض المعاينة
+            // معاينة
             const reader = new FileReader();
             reader.onload = (e) => {
                 previewImg.src = e.target.result;
@@ -1169,99 +1175,111 @@
             };
             reader.readAsDataURL(file);
 
-            // رفع الملف إلى Firebase Storage
-            uploadImageToStorage(file);
+            // إخفاء الحقل الاحتياطي
+            urlFallbackGroup.style.display = 'none';
+            prodImgFallback.value = '';
+
+            // رفع إلى ImgBB
+            uploadToImgBB(file);
         }
 
-        // ---- رفع الصورة إلى Storage ----
-        function uploadImageToStorage(file) {
+        // ---- رفع الصورة إلى ImgBB ----
+        async function uploadToImgBB(file) {
             if (isUploading) return;
             isUploading = true;
 
-            // تعطيل زر الحفظ أثناء الرفع
             const submitBtn = document.getElementById('btnSubmitForm');
             submitBtn.disabled = true;
 
-            // إنشاء اسم فريد للملف
-            const timestamp = Date.now();
-            const ext = file.name.split('.').pop();
-            const fileName = `products/${timestamp}_${Math.random().toString(36).substring(2, 8)}.${ext}`;
-            const storageRef = ref(storage, fileName);
-
-            // بدء الرفع
-            uploadTask = uploadBytesResumable(storageRef, file);
-
-            // إظهار شريط التقدم
             progressContainer.style.display = 'block';
             progressFill.style.width = '0%';
             progressText.textContent = `${t('uploading')} 0%`;
 
-            uploadTask.on(
-                'state_changed',
-                (snapshot) => {
-                    const percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-                    progressFill.style.width = percent + '%';
-                    progressText.textContent = `${t('uploading')} ${percent}%`;
-                },
-                (error) => {
-                    // فشل الرفع
-                    console.error('Upload error:', error);
-                    alert(t('uploadFail'));
+            try {
+                // تحويل الملف إلى Base64
+                const base64 = await fileToBase64(file);
+
+                // إرسال إلى ImgBB
+                const formData = new FormData();
+                formData.append('key', IMGBB_API_KEY);
+                formData.append('image', base64.split(',')[1]); // نرسل الجزء المشفر فقط
+                formData.append('name', file.name);
+
+                const response = await fetch('https://api.imgbb.com/1/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                // محاكاة التقدم (لأن ImgBB لا يوفر نسبة تقدم)
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 10;
+                    if (progress <= 90) {
+                        progressFill.style.width = progress + '%';
+                        progressText.textContent = `${t('uploading')} ${progress}%`;
+                    }
+                }, 200);
+
+                const data = await response.json();
+                clearInterval(interval);
+
+                if (data.success) {
+                    // نجاح الرفع
+                    const imageUrl = data.data.url;
+                    uploadedFileURL = imageUrl;
+                    prodImgInput.value = imageUrl;
+                    prodImgFallback.value = imageUrl;
+
+                    progressFill.style.width = '100%';
+                    progressText.textContent = `${t('uploadSuccess')} 100%`;
+                    uploadArea.style.borderColor = 'var(--success-color)';
+                    setTimeout(() => {
+                        uploadArea.style.borderColor = 'var(--upload-border)';
+                    }, 2000);
+
                     isUploading = false;
                     submitBtn.disabled = false;
-                    progressContainer.style.display = 'none';
-                    uploadTask = null;
-                },
-                async () => {
-                    // نجاح الرفع
-                    try {
-                        const downloadURL = await getDownloadURL(storageRef);
-                        uploadedFileURL = downloadURL;
-                        prodImgInput.value = downloadURL;
-                        isUploading = false;
-                        submitBtn.disabled = false;
-                        progressFill.style.width = '100%';
-                        progressText.textContent = `${t('uploadSuccess')} 100%`;
-                        uploadTask = null;
+                    urlFallbackGroup.style.display = 'none';
 
-                        // إخفاء شريط التقدم بعد 1.5 ثانية
-                        setTimeout(() => {
-                            progressContainer.style.display = 'none';
-                        }, 1500);
-
-                        // تغيير لون الإطار إلى الأخضر
-                        uploadArea.style.borderColor = 'var(--success-color)';
-                        setTimeout(() => {
-                            uploadArea.style.borderColor = 'var(--upload-border)';
-                        }, 2000);
-
-                    } catch (err) {
-                        console.error('Get download URL error:', err);
-                        alert(t('uploadFail'));
-                        isUploading = false;
-                        submitBtn.disabled = false;
+                    setTimeout(() => {
                         progressContainer.style.display = 'none';
-                        uploadTask = null;
-                    }
+                    }, 1500);
+                } else {
+                    throw new Error(data.error?.message || 'فشل الرفع');
                 }
-            );
+
+            } catch (error) {
+                console.error('ImgBB upload error:', error);
+                alert(t('uploadFail') + '\n' + (error.message || ''));
+                isUploading = false;
+                submitBtn.disabled = false;
+                progressContainer.style.display = 'none';
+                urlFallbackGroup.style.display = 'block';
+                prodImgFallback.focus();
+                uploadArea.style.borderColor = '#e67e22';
+            }
         }
 
-        // ---- إزالة الصورة المرفوعة ----
+        // ---- تحويل الملف إلى Base64 ----
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = (error) => reject(error);
+            });
+        }
+
+        // ---- إزالة الصورة ----
         removeFileBtn.addEventListener('click', () => {
-            // إلغاء أي رفع جارٍ
-            if (uploadTask) {
-                try { uploadTask.cancel(); } catch (_) {}
-                uploadTask = null;
-                isUploading = false;
-                document.getElementById('btnSubmitForm').disabled = false;
-            }
-            // حذف الملف من Storage (اختياري - يمكن تركه)
-            // لكننا نفضل فقط إعادة تعيين الواجهة
+            isUploading = false;
+            document.getElementById('btnSubmitForm').disabled = false;
             resetUploadUI();
-            // مسح الرابط من الحقل المخفي
             uploadedFileURL = '';
             prodImgInput.value = '';
+            prodImgFallback.value = '';
+            urlFallbackGroup.style.display = 'none';
+            uploadArea.style.borderColor = 'var(--upload-border)';
         });
 
         function resetUploadUI() {
@@ -1273,8 +1291,8 @@
             progressFill.style.width = '0%';
             progressText.textContent = '';
             fileInput.value = '';
-            uploadArea.style.borderColor = 'var(--upload-border)';
-            // لا نمسح prodImgInput هنا لأننا نريد الاحتفاظ بالرابط القديم في وضع التعديل
+            urlFallbackGroup.style.display = 'none';
+            prodImgFallback.value = '';
         }
 
         // ================================================================
@@ -1284,14 +1302,18 @@
         window.handleFormSubmit = async function(e) {
             e.preventDefault();
 
-            // التأكد من وجود رابط الصورة (إما من الرفع أو من حقل الرابط)
-            const imgUrl = prodImgInput.value.trim();
+            // جلب الرابط من الحقل المخفي أو الاحتياطي
+            let imgUrl = prodImgInput.value.trim();
+            if (!imgUrl && prodImgFallback.value.trim()) {
+                imgUrl = prodImgFallback.value.trim();
+                prodImgInput.value = imgUrl;
+            }
+
             if (!imgUrl) {
-                alert(currentLang === 'ar' ? 'يرجى رفع صورة للمنتج أولاً.' : 'Please upload a product image first.');
+                alert(currentLang === 'ar' ? 'يرجى رفع صورة للمنتج أو إدخال رابط يدوي.' : 'Please upload an image or enter a manual URL.');
                 return;
             }
 
-            // إذا كان هناك رفع جارٍ ننتظر
             if (isUploading) {
                 alert(currentLang === 'ar' ? 'الرجاء الانتظار حتى انتهاء رفع الصورة.' : 'Please wait for the image upload to finish.');
                 return;
@@ -1329,6 +1351,8 @@
                     resetUploadUI();
                     uploadedFileURL = '';
                     prodImgInput.value = '';
+                    prodImgFallback.value = '';
+                    urlFallbackGroup.style.display = 'none';
                 }
             } catch (err) {
                 alert('Error: ' + err.message);
@@ -1340,13 +1364,8 @@
             const product = globalProductsArray.find(p => p.key === key);
             if (!product) return;
 
-            // إلغاء أي رفع جارٍ
-            if (uploadTask) {
-                try { uploadTask.cancel(); } catch (_) {}
-                uploadTask = null;
-                isUploading = false;
-                document.getElementById('btnSubmitForm').disabled = false;
-            }
+            isUploading = false;
+            document.getElementById('btnSubmitForm').disabled = false;
 
             editMode = true;
             currentEditKey = key;
@@ -1356,17 +1375,17 @@
             document.getElementById('prodNameEn').value = product.nameEn || '';
             document.getElementById('prodPrice').value = product.price;
 
-            // تعبئة حقل الرابط المخفي بالرابط الموجود
-            prodImgInput.value = product.img || '';
-            uploadedFileURL = product.img || '';
+            const imgUrl = product.img || '';
+            prodImgInput.value = imgUrl;
+            prodImgFallback.value = imgUrl;
+            uploadedFileURL = imgUrl;
 
-            // عرض الصورة في المعاينة
-            if (product.img) {
-                previewImg.src = product.img;
+            if (imgUrl) {
+                previewImg.src = imgUrl;
                 previewContainer.style.display = 'flex';
                 fileName.textContent = product.nameAr || product.name || 'صورة';
                 fileSize.textContent = '';
-                // نعرض رابط مختصر
+                urlFallbackGroup.style.display = 'none';
             } else {
                 resetUploadUI();
             }
@@ -1381,19 +1400,10 @@
             window.scrollTo({ top: document.querySelector('.form-card').offsetTop - 100, behavior: 'smooth' });
         };
 
-        // ===== حذف منتج =====
+        // ===== حذف المنتج =====
         window.deleteProduct = async function(key) {
             if (!confirm(t('confirmDelete'))) return;
             try {
-                // حذف الصورة من Storage (اختياري)
-                const product = globalProductsArray.find(p => p.key === key);
-                if (product && product.img) {
-                    try {
-                        const oldRef = ref(storage, product.img);
-                        await deleteObject(oldRef);
-                    } catch (_) { /* قد يكون الرابط غير صالح للتخزين */ }
-                }
-
                 const docRef = doc(db, 'Products', key);
                 await deleteDoc(docRef);
                 alert(t('deleteSuccess'));
@@ -1414,13 +1424,10 @@
             resetUploadUI();
             uploadedFileURL = '';
             prodImgInput.value = '';
-            // إلغاء أي رفع جارٍ
-            if (uploadTask) {
-                try { uploadTask.cancel(); } catch (_) {}
-                uploadTask = null;
-                isUploading = false;
-                document.getElementById('btnSubmitForm').disabled = false;
-            }
+            prodImgFallback.value = '';
+            urlFallbackGroup.style.display = 'none';
+            isUploading = false;
+            document.getElementById('btnSubmitForm').disabled = false;
 
             const dict = localizationDict[currentLang];
             document.getElementById('formHeading').innerText = dict.formHeading;
@@ -1431,22 +1438,21 @@
         window.addEventListener('DOMContentLoaded', () => {
             checkSession();
             window.applyLanguage(currentLang);
-
-            // إضافة مستمع لإعادة تعيين النموذج عند الضغط على Esc في الحقول
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && editMode) {
-                    resetForm();
-                }
+                if (e.key === 'Escape' && editMode) resetForm();
             });
         });
 
-        // ===== تصدير الدوال للنطاق العام =====
+        // تصدير الدوال للنطاق العام
         window.t = t;
         window.resetUploadUI = resetUploadUI;
         window.handleFile = handleFile;
+        window.uploadToImgBB = uploadToImgBB;
 
-        console.log('🚀 Cloud Art Admin جاهز مع رفع الصور بالسحب والإفلات!');
-        console.log('📸 اسحب أي صورة إلى المنطقة المخصصة وسيتم رفعها تلقائياً إلى Firebase Storage.');
+        console.log('✅ Cloud Art Admin جاهز مع رفع الصور عبر ImgBB (بديل Firebase Storage)');
+        console.log('📸 اسحب الصورة إلى المنطقة المخصصة وسيتم رفعها تلقائياً إلى ImgBB.');
+        console.log('🔑 مفتاح ImgBB الحالي:', IMGBB_API_KEY);
+        console.log('💡 يمكنك تغيير المفتاح عبر المتغير IMGBB_API_KEY في أعلى الكود.');
     </script>
 
 </body>
