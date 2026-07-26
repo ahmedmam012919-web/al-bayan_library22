@@ -880,9 +880,8 @@
         const db = getFirestore(app);
         const productsCollection = collection(db, 'Products');
 
-        // ===== مفتاح ImgBB (مجاني، احصل على مفتاحك من api.imgbb.com) =====
-        // يمكنك استبدال هذا المفتاح بمفتاحك الشخصي
-        const IMGBB_API_KEY = '6d207e02198a847aa8d0a2a901fa8ebd'; // مفتاح تجريبي عام
+        // ===== مفتاح ImgBB الخاص بك (تم تحديثه) =====
+        const IMGBB_API_KEY = 'e39d6576adec7a3cb1fe4f8e77cdf004';
 
         // ===== متغيرات الحالة العامة =====
         let currentLang = localStorage.getItem('albayan_lang') || 'ar';
@@ -1451,8 +1450,7 @@
 
         console.log('✅ Cloud Art Admin جاهز مع رفع الصور عبر ImgBB (بديل Firebase Storage)');
         console.log('📸 اسحب الصورة إلى المنطقة المخصصة وسيتم رفعها تلقائياً إلى ImgBB.');
-        console.log('🔑 مفتاح ImgBB الحالي:', IMGBB_API_KEY);
-        console.log('💡 يمكنك تغيير المفتاح عبر المتغير IMGBB_API_KEY في أعلى الكود.');
+        console.log('🔑 مفتاح ImgBB المستخدم:', IMGBB_API_KEY);
     </script>
 
 </body>
